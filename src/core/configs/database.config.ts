@@ -9,13 +9,15 @@ import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 config({ path: '.env' });
 
 const dbDriver = process.env.DB_DRIVER?.toLowerCase();
-const isPostgres = ['postgres', 'postgresql', 'supabase'].includes(
-  dbDriver ?? '',
-);
 const databaseUrl = process.env.DATABASE_URL ?? process.env.SUPABASE_DB_URL;
+const isPostgres =
+  ['postgres', 'postgresql', 'supabase'].includes(dbDriver ?? '') ||
+  databaseUrl?.startsWith('postgres://') ||
+  databaseUrl?.startsWith('postgresql://');
 
 const databaseModule = MikroOrmModule.forRoot({
   allowGlobalContext: true,
+  connect: false,
   entities: [User, Feedback, ExportedFeedbacks],
   driver: (isPostgres ? PostgreSqlDriver : MsSqlDriver) as any,
   ...(databaseUrl
