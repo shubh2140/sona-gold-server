@@ -5,7 +5,7 @@ import helmet from 'helmet';
 import 'reflect-metadata';
 import { AppModule } from './app.module';
 
-async function bootstrap() {
+export async function createApp() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
   app.use(helmet());
@@ -36,6 +36,14 @@ async function bootstrap() {
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
 
+  return app;
+}
+
+async function bootstrap() {
+  const app = await createApp();
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+
+if (require.main === module) {
+  void bootstrap();
+}
